@@ -6,11 +6,11 @@ use std::path::Path;
 
 use html_outliner::Outline;
 
-const DATA_FOLDER: &str = "tests/data";
+const DATA_FOLDER: &str = "data";
 
 #[test]
 fn test_files_in_the_data_folder() {
-    let data_folder = Path::new(DATA_FOLDER);
+    let data_folder = Path::new("tests").join(DATA_FOLDER);
 
     for dir in data_folder.read_dir().unwrap().into_iter().map(|dir| dir.unwrap()) {
         if dir.file_type().unwrap().is_file() {
