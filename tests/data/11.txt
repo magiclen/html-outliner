@@ -1,0 +1,4 @@
+1. The morning — 06:00 to 12:00
+2. The afternoon — 12:00 to 18:00
+3. The evening — 18:00 to 00:00
+4. The night — 00:00 to 06:00
