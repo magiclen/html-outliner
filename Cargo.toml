@@ -1,6 +1,6 @@
 [package]
 name = "html-outliner"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2018"
 repository = "https://github.com/magiclen/html-outliner"
@@ -10,6 +10,7 @@ categories = ["parser-implementations"]
 description= "Outline HTML documents for better SEO."
 readme = "README.md"
 license = "MIT"
+include = ["src/**/*", "Cargo.toml"]
 
 [badges.travis-ci]
 repository = "magiclen/html-outliner"
