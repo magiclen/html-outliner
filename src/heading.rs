@@ -54,9 +54,9 @@ pub(crate) fn create_heading(node: NodeRef, depth: usize, max_depth: usize) -> O
 
         match local_name_length {
             2 => {
-                if local_name.starts_with('h') {
-                    match local_name[1..].parse::<u8>() {
-                        Ok(level) if level >= 1 && level <= 6 => {
+                if let Some(stripped_local_name) = local_name.strip_prefix('h') {
+                    match stripped_local_name.parse::<u8>() {
+                        Ok(level) if (1..=6).contains(&level) => {
                             Heading::Header {
                                 level,
                                 text: String::new(),
@@ -106,10 +106,10 @@ pub(crate) fn create_heading(node: NodeRef, depth: usize, max_depth: usize) -> O
     Some(heading)
 }
 
-impl Into<String> for Heading {
+impl From<Heading> for String {
     #[inline]
-    fn into(self) -> String {
-        match self {
+    fn from(heading: Heading) -> String {
+        match heading {
             Heading::Header {
                 text,
                 ..

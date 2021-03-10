@@ -15,22 +15,18 @@ pub enum SectioningType {
 impl SectioningType {
     #[inline]
     pub(crate) fn is_sectioning_content_type(&self) -> bool {
-        match self {
+        matches!(
+            self,
             SectioningType::Article
-            | SectioningType::Aside
-            | SectioningType::Nav
-            | SectioningType::Section => true,
-            _ => false,
-        }
+                | SectioningType::Aside
+                | SectioningType::Nav
+                | SectioningType::Section
+        )
     }
 
     #[inline]
     pub(crate) fn is_heading(&self) -> bool {
-        if let SectioningType::Heading = self {
-            true
-        } else {
-            false
-        }
+        matches!(self, SectioningType::Heading)
     }
 
     #[inline]
