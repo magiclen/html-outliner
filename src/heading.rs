@@ -1,13 +1,13 @@
 extern crate kuchiki;
+extern crate once_cell;
 extern crate regex;
 
 use kuchiki::{NodeData, NodeRef};
 
+use once_cell::sync::Lazy;
 use regex::Regex;
 
-lazy_static! {
-    static ref RE_NEW_LINE: Regex = Regex::new("\n[\n\t ]*").unwrap();
-}
+static RE_NEW_LINE: Lazy<Regex> = Lazy::new(|| Regex::new("\n[\n\t ]*").unwrap());
 
 #[derive(Debug, Clone)]
 pub enum Heading {

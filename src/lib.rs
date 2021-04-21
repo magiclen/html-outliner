@@ -36,9 +36,6 @@ println!("{}", outline);
 ```
 */
 
-#[macro_use]
-extern crate lazy_static;
-
 mod heading;
 mod outline;
 mod outline_structure;
