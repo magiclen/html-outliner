@@ -12,10 +12,6 @@ readme = "README.md"
 license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
-[badges.travis-ci]
-repository = "magiclen/html-outliner"
-branch = "master"
-
 [dependencies]
 kuchiki = "0.8.0"
 regex = "1"

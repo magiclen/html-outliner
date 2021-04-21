@@ -1,7 +1,7 @@
 HTML Outliner
 ====================
 
-[![Build Status](https://travis-ci.org/magiclen/html-outliner.svg?branch=master)](https://travis-ci.org/magiclen/html-outliner)
+[![CI](https://github.com/magiclen/html-outliner/actions/workflows/ci.yml/badge.svg)](https://github.com/magiclen/html-outliner/actions/workflows/ci.yml)
 
 Outline HTML documents for better SEO.
 
