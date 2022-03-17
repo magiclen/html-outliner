@@ -1,5 +1,3 @@
-extern crate kuchiki;
-
 use crate::heading::*;
 use crate::sectioning_type::SectioningType;
 

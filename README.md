@@ -8,8 +8,6 @@ Outline HTML documents for better SEO.
 ## Examples
 
 ```rust
-extern crate html_outliner;
-
 use html_outliner::Outline;
 
 const MAX_DEPTH: usize = 50;

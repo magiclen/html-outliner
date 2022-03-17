@@ -1,7 +1,3 @@
-extern crate kuchiki;
-extern crate once_cell;
-extern crate regex;
-
 use kuchiki::{NodeData, NodeRef};
 
 use once_cell::sync::Lazy;

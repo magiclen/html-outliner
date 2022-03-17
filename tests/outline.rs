@@ -1,5 +1,3 @@
-extern crate html_outliner;
-
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -17,12 +15,10 @@ fn test_files_in_the_data_folder() {
             let file_path = dir.path();
             let file_name = file_path.file_name().unwrap().to_str().unwrap();
 
-            if file_name.ends_with(".html") {
+            if let Some(file_name) = file_name.strip_suffix(".html") {
                 let html_file_path = &file_path;
-                let outline_file_path = html_file_path
-                    .parent()
-                    .unwrap()
-                    .join(format!("{}.txt", &file_name[..(file_name.len() - 5)]));
+                let outline_file_path =
+                    html_file_path.parent().unwrap().join(format!("{}.txt", file_name));
 
                 let mut html_file = File::open(html_file_path).unwrap();
                 let mut html = String::new();
