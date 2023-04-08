@@ -10,7 +10,7 @@ const DATA_FOLDER: &str = "data";
 fn test_files_in_the_data_folder() {
     let data_folder = Path::new("tests").join(DATA_FOLDER);
 
-    for dir in data_folder.read_dir().unwrap().into_iter().map(|dir| dir.unwrap()) {
+    for dir in data_folder.read_dir().unwrap().map(|dir| dir.unwrap()) {
         if dir.file_type().unwrap().is_file() {
             let file_path = dir.path();
             let file_name = file_path.file_name().unwrap().to_str().unwrap();
