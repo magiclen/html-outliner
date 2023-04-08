@@ -6,7 +6,7 @@ const EXTRA_INDENT_WIDTH: usize = 1;
 
 #[derive(Debug, Clone, Default)]
 pub struct Outline {
-    pub text: Option<String>,
+    pub text:         Option<String>,
     pub sub_outlines: Vec<Outline>,
 }
 
@@ -22,7 +22,7 @@ impl From<OutlineStructure> for Outline {
     fn from(os: OutlineStructure) -> Self {
         if os.sectioning_type.is_heading() {
             Outline {
-                text: os.heading.map(|heading| heading.into()),
+                text:         os.heading.map(|heading| heading.into()),
                 sub_outlines: Vec::new(),
             }
         } else {
@@ -37,7 +37,7 @@ impl From<OutlineStructure> for Outline {
                     let heading_level = heading.get_start_level();
 
                     let mut outline = Outline {
-                        text: Some(heading.into()),
+                        text:         Some(heading.into()),
                         sub_outlines: Vec::new(),
                     };
 
@@ -75,7 +75,7 @@ impl From<OutlineStructure> for Outline {
 
                 if need_flatten {
                     let mut outline = Outline {
-                        text: Some(heading.into()),
+                        text:         Some(heading.into()),
                         sub_outlines: Vec::new(),
                     };
 

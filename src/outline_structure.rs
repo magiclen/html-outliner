@@ -1,16 +1,14 @@
-use crate::heading::*;
-use crate::sectioning_type::SectioningType;
+use kuchiki::{parse_html, traits::TendrilSink, NodeData, NodeRef};
 
-use kuchiki::traits::TendrilSink;
-use kuchiki::{parse_html, NodeData, NodeRef};
+use crate::{heading::*, sectioning_type::SectioningType};
 
 const SECTIONING_ROOTS: [&str; 7] =
     ["blockquote", "body", "details", "dialog", "fieldset", "figure", "td"];
 
 #[derive(Debug, Clone)]
 pub struct OutlineStructure {
-    pub sectioning_type: SectioningType,
-    pub heading: Option<Heading>,
+    pub sectioning_type:        SectioningType,
+    pub heading:                Option<Heading>,
     pub sub_outline_structures: Vec<OutlineStructure>,
 }
 

@@ -1,5 +1,4 @@
 use kuchiki::{NodeData, NodeRef};
-
 use once_cell::sync::Lazy;
 use regex::Regex;
 
@@ -7,10 +6,7 @@ static RE_NEW_LINE: Lazy<Regex> = Lazy::new(|| Regex::new("\n[\n\t ]*").unwrap()
 
 #[derive(Debug, Clone)]
 pub enum Heading {
-    Header {
-        level: u8,
-        text: String,
-    },
+    Header { level: u8, text: String },
     Group(Vec<Heading>),
 }
 
@@ -19,8 +15,7 @@ impl Heading {
     pub fn get_end_level(&self) -> u8 {
         match self {
             Heading::Header {
-                level,
-                ..
+                level, ..
             } => *level,
             Heading::Group(headings) => headings[headings.len() - 1].get_end_level(),
         }
@@ -30,8 +25,7 @@ impl Heading {
     pub fn get_start_level(&self) -> u8 {
         match self {
             Heading::Header {
-                level,
-                ..
+                level, ..
             } => *level,
             Heading::Group(headings) => headings[0].get_end_level(),
         }
@@ -52,25 +46,23 @@ pub(crate) fn create_heading(node: NodeRef, depth: usize, max_depth: usize) -> O
             2 => {
                 if let Some(stripped_local_name) = local_name.strip_prefix('h') {
                     match stripped_local_name.parse::<u8>() {
-                        Ok(level) if (1..=6).contains(&level) => {
-                            Heading::Header {
-                                level,
-                                text: String::new(),
-                            }
-                        }
+                        Ok(level) if (1..=6).contains(&level) => Heading::Header {
+                            level,
+                            text: String::new(),
+                        },
                         _ => return None,
                     }
                 } else {
                     return None;
                 }
-            }
+            },
             6 => {
                 if local_name.eq("hgroup") {
                     Heading::Group(Vec::with_capacity(2))
                 } else {
                     return None;
                 }
-            }
+            },
             _ => return None,
         }
     } else {
@@ -79,13 +71,12 @@ pub(crate) fn create_heading(node: NodeRef, depth: usize, max_depth: usize) -> O
 
     match &mut heading {
         Heading::Header {
-            text,
-            ..
+            text, ..
         } => {
             for child in node.children() {
                 create_text(text, child, depth + 1, max_depth);
             }
-        }
+        },
         Heading::Group(headings) => {
             for child in node.children() {
                 if let Some(heading) = create_heading(child, depth + 1, max_depth) {
@@ -96,7 +87,7 @@ pub(crate) fn create_heading(node: NodeRef, depth: usize, max_depth: usize) -> O
             if headings.is_empty() {
                 return None;
             }
-        }
+        },
     }
 
     Some(heading)
@@ -107,8 +98,7 @@ impl From<Heading> for String {
     fn from(heading: Heading) -> String {
         match heading {
             Heading::Header {
-                text,
-                ..
+                text, ..
             } => text,
             Heading::Group(headings) => {
                 let mut iter = headings.into_iter();
@@ -123,7 +113,7 @@ impl From<Heading> for String {
                 }
 
                 text
-            }
+            },
         }
     }
 }
