@@ -9,7 +9,6 @@ homepage = "https://magiclen.org/rust-html-outliner"
 keywords = ["html", "outline", "outliner"]
 categories = ["parser-implementations"]
 description = "Outline HTML documents for better SEO."
-readme = "README.md"
 license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
