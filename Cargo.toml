@@ -1,9 +1,9 @@
 [package]
 name = "html-outliner"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.61"
 repository = "https://github.com/magiclen/html-outliner"
 homepage = "https://magiclen.org/rust-html-outliner"
 keywords = ["html", "outline", "outliner"]
