@@ -2,8 +2,8 @@
 name = "html-outliner"
 version = "0.1.6"
 authors = ["Magic Len <len@magiclen.org>"]
-edition = "2021"
-rust-version = "1.80"
+edition = "2024"
+rust-version = "1.88"
 repository = "https://github.com/magiclen/html-outliner"
 homepage = "https://magiclen.org/rust-html-outliner"
 keywords = ["html", "outline", "outliner"]
@@ -13,5 +13,4 @@ license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
-kuchiki = "0.8"
-regex = "1"
+scraper = "0.27"
