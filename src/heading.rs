@@ -2,7 +2,11 @@ use scraper::{ElementRef, Node};
 
 /// A heading found in the parsed HTML tree.
 #[derive(Debug, Clone)]
-pub enum Heading {
+pub struct Heading(HeadingKind);
+
+/// The internal representation of a heading, kept private so a `Heading` cannot be constructed outside this crate.
+#[derive(Debug, Clone)]
+enum HeadingKind {
     /// A normal `h1` through `h6` heading.
     Header { level: u8, text: String },
     /// A compatibility group created from heading children inside `hgroup`.
@@ -10,23 +14,25 @@ pub enum Heading {
 }
 
 impl Heading {
+    /// Returns the heading level at the end of this heading, following the last child heading when this is a group.
     #[inline]
     pub fn get_end_level(&self) -> u8 {
-        match self {
-            Heading::Header {
+        match &self.0 {
+            HeadingKind::Header {
                 level, ..
             } => *level,
-            Heading::Group(headings) => headings[headings.len() - 1].get_end_level(),
+            HeadingKind::Group(headings) => headings[headings.len() - 1].get_end_level(),
         }
     }
 
+    /// Returns the heading level at the start of this heading, following the first child heading when this is a group.
     #[inline]
     pub fn get_start_level(&self) -> u8 {
-        match self {
-            Heading::Header {
+        match &self.0 {
+            HeadingKind::Header {
                 level, ..
             } => *level,
-            Heading::Group(headings) => headings[0].get_end_level(),
+            HeadingKind::Group(headings) => headings[0].get_start_level(),
         }
     }
 }
@@ -43,11 +49,11 @@ pub(crate) fn create_heading(
     let local_name = element.value().name();
     let local_name_length = local_name.len();
 
-    let mut heading = match local_name_length {
+    let mut kind = match local_name_length {
         2 => {
             if let Some(stripped_local_name) = local_name.strip_prefix('h') {
                 match stripped_local_name.parse::<u8>() {
-                    Ok(level) if (1..=6).contains(&level) => Heading::Header {
+                    Ok(level) if (1..=6).contains(&level) => HeadingKind::Header {
                         level,
                         text: String::new(),
                     },
@@ -57,17 +63,17 @@ pub(crate) fn create_heading(
                 return None;
             }
         },
-        6 if local_name.eq("hgroup") => Heading::Group(Vec::with_capacity(2)),
+        6 if local_name.eq("hgroup") => HeadingKind::Group(Vec::with_capacity(2)),
         _ => return None,
     };
 
-    match &mut heading {
-        Heading::Header {
+    match &mut kind {
+        HeadingKind::Header {
             text, ..
         } => {
             *text = create_text(element, depth, max_depth);
         },
-        Heading::Group(headings) => {
+        HeadingKind::Group(headings) => {
             // This keeps the crate's older hgroup behavior by joining heading children instead of choosing only one heading.
             for child in element.child_elements() {
                 if let Some(heading) = create_heading(child, depth + 1, max_depth) {
@@ -81,7 +87,7 @@ pub(crate) fn create_heading(
         },
     }
 
-    Some(heading)
+    Some(Heading(kind))
 }
 
 #[inline]
@@ -94,7 +100,7 @@ pub(crate) fn create_text(element: ElementRef<'_>, depth: usize, max_depth: usiz
     let mut stack = Vec::new();
 
     // The explicit stack keeps text extraction iterative and preserves the same order as a recursive depth-first walk.
-    for child in element.children().collect::<Vec<_>>().into_iter().rev() {
+    for child in element.children().rev() {
         stack.push((depth + 1, child));
     }
 
@@ -106,7 +112,7 @@ pub(crate) fn create_text(element: ElementRef<'_>, depth: usize, max_depth: usiz
         match node.value() {
             Node::Text(text) => raw_text.push_str(text),
             Node::Document | Node::Fragment | Node::Element(_) => {
-                for child in node.children().collect::<Vec<_>>().into_iter().rev() {
+                for child in node.children().rev() {
                     stack.push((node_depth + 1, child));
                 }
             },
@@ -120,11 +126,11 @@ pub(crate) fn create_text(element: ElementRef<'_>, depth: usize, max_depth: usiz
 impl From<Heading> for String {
     #[inline]
     fn from(heading: Heading) -> String {
-        match heading {
-            Heading::Header {
+        match heading.0 {
+            HeadingKind::Header {
                 text, ..
             } => text,
-            Heading::Group(headings) => {
+            HeadingKind::Group(headings) => {
                 let mut iter = headings.into_iter();
 
                 let mut text: String = iter.next().unwrap().into();

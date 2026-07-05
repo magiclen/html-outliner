@@ -37,6 +37,7 @@ impl SectioningType {
         matches!(self, SectioningType::Heading)
     }
 
+    /// Returns the sectioning content type for the given tag name, or `None` when the tag is not sectioning content.
     #[inline]
     pub fn from_sectioning_content_tag<S: AsRef<str>>(s: S) -> Option<SectioningType> {
         let s = s.as_ref();
@@ -50,6 +51,7 @@ impl SectioningType {
         }
     }
 
+    /// Returns the lowercase HTML name of this sectioning type.
     #[inline]
     pub fn as_str(&self) -> &'static str {
         match self {

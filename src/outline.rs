@@ -17,6 +17,7 @@ pub struct Outline {
 }
 
 impl Outline {
+    /// Parses HTML and builds a displayable outline, ignoring any nodes deeper than `max_depth`.
     #[inline]
     pub fn parse_html<S: AsRef<str>>(html: S, max_depth: usize) -> Outline {
         OutlineStructure::parse_html(html, max_depth).into()
@@ -53,17 +54,9 @@ impl From<OutlineStructure> for Outline {
                 let heading_level = heading.get_start_level();
                 let heading_text = heading.into();
 
-                let need_flatten = {
-                    let mut b = false;
-
-                    for (level, _) in stack.iter().rev() {
-                        if level.is_some_and(|level| level >= heading_level) {
-                            b = true;
-                        }
-                    }
-
-                    b
-                };
+                let need_flatten = stack
+                    .iter()
+                    .any(|(level, _)| level.is_some_and(|level| level >= heading_level));
 
                 if need_flatten {
                     push_heading_outline(&mut stack, heading_level, heading_text);
@@ -148,5 +141,6 @@ fn format(
 
 #[inline]
 fn count_digit(n: usize) -> usize {
-    (n as f64).log10().floor() as usize + 1
+    // Integer digit counting avoids the platform-dependent rounding of floating-point log10 and needs no float unit.
+    n.checked_ilog10().unwrap_or(0) as usize + 1
 }
