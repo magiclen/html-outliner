@@ -56,13 +56,7 @@ pub(crate) fn create_heading(node: NodeRef, depth: usize, max_depth: usize) -> O
                     return None;
                 }
             },
-            6 => {
-                if local_name.eq("hgroup") {
-                    Heading::Group(Vec::with_capacity(2))
-                } else {
-                    return None;
-                }
-            },
+            6 if local_name.eq("hgroup") => Heading::Group(Vec::with_capacity(2)),
             _ => return None,
         }
     } else {
