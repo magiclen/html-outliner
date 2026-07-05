@@ -1,8 +1,9 @@
+use std::sync::LazyLock;
+
 use kuchiki::{NodeData, NodeRef};
-use once_cell::sync::Lazy;
 use regex::Regex;
 
-static RE_NEW_LINE: Lazy<Regex> = Lazy::new(|| Regex::new("\n[\n\t ]*").unwrap());
+static RE_NEW_LINE: LazyLock<Regex> = LazyLock::new(|| Regex::new("\n[\n\t ]*").unwrap());
 
 #[derive(Debug, Clone)]
 pub enum Heading {
