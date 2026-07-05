@@ -1,14 +1,22 @@
+/// The kind of HTML structure represented by an outline structure node.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum SectioningType {
     // ----- Sectioning Content -----
+    /// An `article` element.
     Article,
+    /// An `aside` element.
     Aside,
+    /// A `nav` element.
     Nav,
+    /// A `section` element.
     Section,
 
     // ----- Element -----
+    /// A generic root used while flattening normal wrapper elements.
     Root,
+    /// A `body` element.
     Body,
+    /// An implied outline item created from a heading after the first heading in a section.
     Heading,
 }
 

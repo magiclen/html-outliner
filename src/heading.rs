@@ -1,8 +1,11 @@
 use scraper::{ElementRef, Node};
 
+/// A heading found in the parsed HTML tree.
 #[derive(Debug, Clone)]
 pub enum Heading {
+    /// A normal `h1` through `h6` heading.
     Header { level: u8, text: String },
+    /// A compatibility group created from heading children inside `hgroup`.
     Group(Vec<Heading>),
 }
 
@@ -65,6 +68,7 @@ pub(crate) fn create_heading(
             *text = create_text(element, depth, max_depth);
         },
         Heading::Group(headings) => {
+            // This keeps the crate's older hgroup behavior by joining heading children instead of choosing only one heading.
             for child in element.child_elements() {
                 if let Some(heading) = create_heading(child, depth + 1, max_depth) {
                     headings.push(heading);
@@ -89,6 +93,7 @@ pub(crate) fn create_text(element: ElementRef<'_>, depth: usize, max_depth: usiz
     let mut raw_text = String::new();
     let mut stack = Vec::new();
 
+    // The explicit stack keeps text extraction iterative and preserves the same order as a recursive depth-first walk.
     for child in element.children().collect::<Vec<_>>().into_iter().rev() {
         stack.push((depth + 1, child));
     }

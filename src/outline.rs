@@ -4,11 +4,15 @@ use crate::OutlineStructure;
 
 const EXTRA_INDENT_WIDTH: usize = 1;
 
+// The level is present only for heading-created outlines, while sectioning-content outlines keep their place without changing heading-level nesting.
 type StackEntry = (Option<u8>, Outline);
 
+/// A displayable HTML outline.
 #[derive(Debug, Clone, Default)]
 pub struct Outline {
+    /// The visible text for this outline item.
     pub text:         Option<String>,
+    /// The nested outline items under this item.
     pub sub_outlines: Vec<Outline>,
 }
 
@@ -19,6 +23,7 @@ impl Outline {
     }
 }
 
+/// Converts parsed HTML into a displayable outline.
 impl From<OutlineStructure> for Outline {
     #[inline]
     fn from(os: OutlineStructure) -> Self {
@@ -90,6 +95,7 @@ fn push_heading_outline(stack: &mut Vec<StackEntry>, heading_level: u8, heading_
         text: Some(heading_text), sub_outlines: Vec::new()
     };
 
+    // Only heading-created outlines can be absorbed by a new heading, and sectioning-content outlines must stay in document order.
     while let Some((level, _)) = stack.last() {
         if level.is_some_and(|level| level <= heading_level) {
             break;

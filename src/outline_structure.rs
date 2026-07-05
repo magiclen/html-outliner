@@ -5,10 +5,14 @@ use crate::{heading::*, sectioning_type::SectioningType};
 const SECTIONING_ROOTS: [&str; 7] =
     ["blockquote", "body", "details", "dialog", "fieldset", "figure", "td"];
 
+/// A compact intermediate outline tree built from the parsed HTML tree.
 #[derive(Debug, Clone)]
 pub struct OutlineStructure {
+    /// The kind of HTML structure that created this node.
     pub sectioning_type:        SectioningType,
+    /// The heading that names this node when one was found.
     pub heading:                Option<Heading>,
+    /// The nested outline structures found inside this node.
     pub sub_outline_structures: Vec<OutlineStructure>,
 }
 
@@ -23,6 +27,7 @@ impl OutlineStructure {
     }
 
     #[inline]
+    /// Parses HTML and builds the intermediate outline tree.
     pub fn parse_html<S: AsRef<str>>(html: S, max_depth: usize) -> OutlineStructure {
         let document = Html::parse_document(html.as_ref());
         let root_element = document.root_element();
@@ -50,11 +55,13 @@ pub(crate) fn create_outline_structure(
 
     let mut outline_structure = OutlineStructure::new(sectioning_type);
 
+    // The first heading names the current section, and later headings become child outline items.
     let mut find_heading = true;
 
     for child in element.child_elements() {
         let local_name = child.value().name();
 
+        // Inner sectioning roots keep their headings out of the current outline.
         if SECTIONING_ROOTS.binary_search(&local_name).is_ok() {
             continue;
         }
@@ -79,6 +86,7 @@ pub(crate) fn create_outline_structure(
             if let Some(sub_outline_structure) =
                 create_outline_structure(SectioningType::Root, child, depth + 1, max_depth)
             {
+                // A normal wrapper can contain the first heading, and that must still close the first-heading phase.
                 let has_sub_outline_structures =
                     !sub_outline_structure.sub_outline_structures.is_empty();
                 let has_heading = sub_outline_structure.heading.is_some();
