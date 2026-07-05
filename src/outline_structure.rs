@@ -79,6 +79,10 @@ pub(crate) fn create_outline_structure(
             if let Some(sub_outline_structure) =
                 create_outline_structure(SectioningType::Root, child, depth + 1, max_depth)
             {
+                let has_sub_outline_structures =
+                    !sub_outline_structure.sub_outline_structures.is_empty();
+                let has_heading = sub_outline_structure.heading.is_some();
+
                 if let Some(heading) = sub_outline_structure.heading {
                     if find_heading {
                         outline_structure.heading = Some(heading);
@@ -94,6 +98,10 @@ pub(crate) fn create_outline_structure(
 
                 for os in sub_outline_structure.sub_outline_structures {
                     outline_structure.sub_outline_structures.push(os);
+                }
+
+                if has_heading || has_sub_outline_structures {
+                    find_heading = false;
                 }
             }
 

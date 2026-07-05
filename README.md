@@ -5,6 +5,12 @@ HTML Outliner
 
 Outline HTML documents for better SEO.
 
+## Outline Policy
+
+This crate builds a practical SEO and table-of-contents outline from the document body, sectioning content, heading elements, and `hgroup`.
+It follows HTML sectioning concepts where they are useful for document outlines, but it does not try to be a complete implementation of a browser accessibility tree or the old HTML5 outline algorithm.
+For compatibility, `hgroup` currently joins its heading children with ` — `.
+
 ## Examples
 
 ```rust

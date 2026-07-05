@@ -4,6 +4,8 @@ use crate::OutlineStructure;
 
 const EXTRA_INDENT_WIDTH: usize = 1;
 
+type StackEntry = (Option<u8>, Outline);
+
 #[derive(Debug, Clone, Default)]
 pub struct Outline {
     pub text:         Option<String>,
@@ -28,44 +30,29 @@ impl From<OutlineStructure> for Outline {
         } else {
             let mut sub_outlines = Vec::new();
 
-            let mut stack = vec![];
-            let mut levels: Vec<u8> = vec![];
+            let mut stack: Vec<StackEntry> = vec![];
 
             for sub_os in os.sub_outline_structures.into_iter().rev() {
                 if sub_os.sectioning_type.is_heading() {
                     let heading = sub_os.heading.unwrap();
                     let heading_level = heading.get_start_level();
+                    let heading_text = heading.into();
 
-                    let mut outline = Outline {
-                        text:         Some(heading.into()),
-                        sub_outlines: Vec::new(),
-                    };
-
-                    while let Some(level) = levels.pop() {
-                        if level > heading_level {
-                            outline.sub_outlines.push(stack.pop().unwrap());
-                        } else {
-                            levels.push(level);
-
-                            break;
-                        }
-                    }
-
-                    levels.push(heading_level);
-                    stack.push(outline);
+                    push_heading_outline(&mut stack, heading_level, heading_text);
                 } else {
-                    stack.push(sub_os.into());
+                    stack.push((None, sub_os.into()));
                 }
             }
 
             let text = if let Some(heading) = os.heading {
                 let heading_level = heading.get_start_level();
+                let heading_text = heading.into();
 
                 let need_flatten = {
                     let mut b = false;
 
-                    for level in levels.iter().copied().rev() {
-                        if level >= heading_level {
+                    for (level, _) in stack.iter().rev() {
+                        if level.is_some_and(|level| level >= heading_level) {
                             b = true;
                         }
                     }
@@ -74,27 +61,11 @@ impl From<OutlineStructure> for Outline {
                 };
 
                 if need_flatten {
-                    let mut outline = Outline {
-                        text:         Some(heading.into()),
-                        sub_outlines: Vec::new(),
-                    };
-
-                    while let Some(level) = levels.pop() {
-                        if level > heading_level {
-                            outline.sub_outlines.push(stack.pop().unwrap());
-                        } else {
-                            levels.push(level);
-
-                            break;
-                        }
-                    }
-
-                    levels.push(heading_level);
-                    stack.push(outline);
+                    push_heading_outline(&mut stack, heading_level, heading_text);
 
                     None
                 } else {
-                    Some(heading.into())
+                    Some(heading_text)
                 }
             } else if os.sectioning_type.is_sectioning_content_type() {
                 Some(format!("Untitled {}", os.sectioning_type.as_str()))
@@ -103,7 +74,7 @@ impl From<OutlineStructure> for Outline {
             };
 
             while let Some(sub_os) = stack.pop() {
-                sub_outlines.push(sub_os);
+                sub_outlines.push(sub_os.1);
             }
 
             Outline {
@@ -112,6 +83,22 @@ impl From<OutlineStructure> for Outline {
             }
         }
     }
+}
+
+fn push_heading_outline(stack: &mut Vec<StackEntry>, heading_level: u8, heading_text: String) {
+    let mut outline = Outline {
+        text: Some(heading_text), sub_outlines: Vec::new()
+    };
+
+    while let Some((level, _)) = stack.last() {
+        if level.is_some_and(|level| level <= heading_level) {
+            break;
+        }
+
+        outline.sub_outlines.push(stack.pop().unwrap().1);
+    }
+
+    stack.push((Some(heading_level), outline));
 }
 
 impl Display for Outline {
