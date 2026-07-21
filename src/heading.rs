@@ -51,16 +51,14 @@ pub(crate) fn create_heading(
 
     let mut kind = match local_name_length {
         2 => {
-            if let Some(stripped_local_name) = local_name.strip_prefix('h') {
-                match stripped_local_name.parse::<u8>() {
-                    Ok(level) if (1..=6).contains(&level) => HeadingKind::Header {
-                        level,
-                        text: String::new(),
-                    },
-                    _ => return None,
-                }
-            } else {
-                return None;
+            let stripped_local_name = local_name.strip_prefix('h')?;
+
+            match stripped_local_name.parse::<u8>() {
+                Ok(level) if (1..=6).contains(&level) => HeadingKind::Header {
+                    level,
+                    text: String::new(),
+                },
+                _ => return None,
             }
         },
         6 if local_name.eq("hgroup") => HeadingKind::Group(Vec::with_capacity(2)),
